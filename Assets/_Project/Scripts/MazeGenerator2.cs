@@ -20,11 +20,12 @@ public class MazeGenerator2 : MonoBehaviour
   [Header("Labyrinth config")]
   [SerializeField] private int width = 20;
   [SerializeField] private int height = 20;
-  [SerializeField] private float cellSize = 1f;
+  [SerializeField] private float cellSize = 3f;
   [SerializeField] private int corridorsNum = 80;
   [SerializeField] private int chestSpawnSectorSize = 6;
 
   [Header("Prefabs")]
+  [SerializeField] private GameObject playerPrefab;
   [SerializeField] private GameObject wallPrefab;
   [SerializeField] private GameObject chestPrefab;
 
@@ -195,10 +196,17 @@ public class MazeGenerator2 : MonoBehaviour
         {
           var floorPos = new Vector3(x * cellSize, -cellSize, y * cellSize);
           Instantiate(wallPrefab, floorPos, Quaternion.identity, transform);
+          var ceilingPos = new Vector3(x * cellSize, cellSize, y * cellSize);
+          Instantiate(wallPrefab, ceilingPos, Quaternion.identity, transform);
           if (cell == CellType.Chest)
           {
             var pos = new Vector3(x * cellSize, -cellSize / 2f, y * cellSize);
             Instantiate(chestPrefab, pos, Quaternion.identity, transform);
+          }
+          else if (cell == CellType.Player)
+          {
+            var pos = new Vector3(x * cellSize, -cellSize / 2f, y * cellSize);
+            Instantiate(playerPrefab, pos, Quaternion.identity, transform);
           }
         }
       }
