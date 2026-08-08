@@ -1,4 +1,4 @@
-using System;
+using System.Linq;
 using UnityEngine;
 using Random = UnityEngine.Random;
 
@@ -15,34 +15,47 @@ public enum Direction
   None, Left, Right, Up, Down
 }
 
-public class MazeGenerator2 : MonoBehaviour
+public class MazeGenerator : MonoBehaviour
 {
   [Header("Labyrinth config")]
   [SerializeField] private int width = 20;
+  public int Width => width;
   [SerializeField] private int height = 20;
+  public int Height => height;
   [SerializeField] private float cellSize = 3f;
+  public float CellSize => cellSize;
   [SerializeField] private int corridorsNum = 80;
-  [SerializeField] private int chestSpawnSectorSize = 6;
 
   [Header("Prefabs")]
   [SerializeField] private GameObject playerPrefab;
   [SerializeField] private GameObject wallPrefab;
-  [SerializeField] private GameObject chestPrefab;
 
   private CellType[,] grid;
+  public CellType[,] Grid => grid;
+
+  private int playerStartX;
+  public int PlayerStartX => playerStartX;
+  private int playerStartY;
+  public int PlayerStartY => playerStartY;
 
 
   void Start()
   {
     GenerateMaze();
     SpawnObjects();
+    var generators = FindObjectsByType<MonoBehaviour>(FindObjectsSortMode.None).OfType<ILevelGenerator>();
+    foreach (var gen in generators)
+    {
+      gen.Generate(this);
+      gen.SpawnObjects(this);
+    }
   }
 
   private void GenerateMaze()
   {
     grid = new CellType[width, height];
-    var playerStartX = Random.Range(5, width - 5);
-    var playerStartY = Random.Range(5, height - 5);
+    playerStartX = Random.Range(5, width - 5);
+    playerStartY = Random.Range(5, height - 5);
 
     for (int x = 0; x < width; x++)
     {
@@ -53,7 +66,6 @@ public class MazeGenerator2 : MonoBehaviour
     }
 
     MakeCorridors(playerStartX, playerStartY);
-    GenerateChests(playerStartX, playerStartY);
     MakeOuterWalls();
 
     grid[playerStartX, playerStartY] = CellType.Player;
@@ -125,56 +137,7 @@ public class MazeGenerator2 : MonoBehaviour
     }
   }
 
-  private void GenerateChests(int playerStartX, int playerStartY)
-  {
-    for (int x = 0; x < width / chestSpawnSectorSize; x++)
-    {
-      for (int y = 0; y < height / chestSpawnSectorSize; y++)
-      {
-        int chestX = Random.Range(x * chestSpawnSectorSize, (x + 1) * chestSpawnSectorSize);
-        int chestY = Random.Range(y * chestSpawnSectorSize, (y + 1) * chestSpawnSectorSize);
-        grid[chestX, chestY] = CellType.Chest;
-        MakeCorridorsToPlayer(Direction.None, chestX, chestY, playerStartX, playerStartY);
-      }
-    }
-  }
-
-  private void MakeCorridorsToPlayer(Direction comesFrom, int startX, int startY, int playerX, int playerY)
-  {
-    var left = IsValid(startX - 1, startY) ? grid[startX - 1, startY] : CellType.Wall;
-    var right = IsValid(startX + 1, startY) ? grid[startX + 1, startY] : CellType.Wall;
-    var up = IsValid(startX, startY - 1) ? grid[startX, startY - 1] : CellType.Wall;
-    var down = IsValid(startX, startY + 1) ? grid[startX, startY + 1] : CellType.Wall;
-    // if our chest is surrounded by walls then make corridor
-    if ((comesFrom == Direction.Left || left == CellType.Wall || left == CellType.Chest) &&
-    (comesFrom == Direction.Right || right == CellType.Wall || right == CellType.Chest) &&
-    (comesFrom == Direction.Up || up == CellType.Wall || up == CellType.Chest) &&
-    (comesFrom == Direction.Down || down == CellType.Wall || down == CellType.Chest))
-    {
-      int dx = playerX - startX;
-      int dy = playerY - startY;
-      if (dx != 0)
-      {
-        // move by x
-        int sign = Math.Sign(dx);
-        var from = sign == 1 ? Direction.Left : Direction.Right;
-        var newX = startX + sign;
-        grid[newX, startY] = CellType.Empty;
-        MakeCorridorsToPlayer(from, newX, startY, playerX, playerY);
-      }
-      else if (dy != 0)
-      {
-        // move by y
-        int sign = Math.Sign(dy);
-        var from = sign == 1 ? Direction.Up : Direction.Down;
-        var newY = startY + sign;
-        grid[startX, newY] = CellType.Empty;
-        MakeCorridorsToPlayer(from, startX, newY, playerX, playerY);
-      }
-    }
-  }
-
-  private bool IsValid(int x, int y)
+  public bool IsValid(int x, int y)
   {
     return x >= 0 && x < width && y >= 0 && y < height;
   }
@@ -190,7 +153,7 @@ public class MazeGenerator2 : MonoBehaviour
         if (cell == CellType.Wall)
         {
           var pos = new Vector3(x * cellSize, 0, y * cellSize);
-          Instantiate(wallPrefab, pos, Quaternion.identity, transform);
+          var obj = Instantiate(wallPrefab, pos, Quaternion.identity, transform);
         }
         else
         {
@@ -198,18 +161,23 @@ public class MazeGenerator2 : MonoBehaviour
           Instantiate(wallPrefab, floorPos, Quaternion.identity, transform);
           var ceilingPos = new Vector3(x * cellSize, cellSize, y * cellSize);
           Instantiate(wallPrefab, ceilingPos, Quaternion.identity, transform);
-          if (cell == CellType.Chest)
-          {
-            var pos = new Vector3(x * cellSize, -cellSize / 2f, y * cellSize);
-            Instantiate(chestPrefab, pos, Quaternion.identity, transform);
-          }
-          else if (cell == CellType.Player)
+          if (cell == CellType.Player)
           {
             var pos = new Vector3(x * cellSize, -cellSize / 2f, y * cellSize);
             Instantiate(playerPrefab, pos, Quaternion.identity, transform);
+            // Instantiate(torchPrefab, pos, Quaternion.identity, transform);
           }
         }
       }
     }
+  }
+
+  public (int, int) GetNearestWall(int posX, int posY)
+  {
+    if (grid[posX - 1, posY] == CellType.Wall) return (-1, 0);
+    if (grid[posX + 1, posY] == CellType.Wall) return (1, 0);
+    if (grid[posX, posY - 1] == CellType.Wall) return (0, -1);
+    if (grid[posX, posY + 1] == CellType.Wall) return (0, 1);
+    throw new System.Exception("Wall not found");
   }
 }

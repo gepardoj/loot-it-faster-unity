@@ -35,7 +35,7 @@ RenderSettings:
   m_DefaultReflectionMode: 0
   m_DefaultReflectionResolution: 128
   m_ReflectionBounces: 1
-  m_ReflectionIntensity: 1
+  m_ReflectionIntensity: 0.1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 0}
   m_UseRadianceAmbientProbe: 0
@@ -119,51 +119,6 @@ NavMeshSettings:
     debug:
       m_Flags: 0
   m_NavMeshData: {fileID: 0}
---- !u!1 &186859821
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 186859822}
-  - component: {fileID: 186859823}
-  m_Layer: 0
-  m_Name: TorchGenerator
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &186859822
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 186859821}
-  serializedVersion: 2
-  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 2112298669}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &186859823
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 186859821}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: ca8f0a25e604b7b4d9bef9e695a3fa85, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::TorchGenerator
-  torchPrefab: {fileID: 2788782464251740857, guid: 2c2bfd9137e117d4193356a215a34cb4, type: 3}
 --- !u!1 &832575517
 GameObject:
   m_ObjectHideFlags: 0
@@ -213,7 +168,7 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!1 &1891395228
+--- !u!1 &917298516
 GameObject:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -221,22 +176,22 @@ GameObject:
   m_PrefabAsset: {fileID: 0}
   serializedVersion: 6
   m_Component:
-  - component: {fileID: 1891395229}
-  - component: {fileID: 1891395230}
+  - component: {fileID: 917298517}
+  - component: {fileID: 917298518}
   m_Layer: 0
-  m_Name: ChestGenerator
+  m_Name: TorchGenerator
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!4 &1891395229
+--- !u!4 &917298517
 Transform:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1891395228}
+  m_GameObject: {fileID: 917298516}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
@@ -245,20 +200,19 @@ Transform:
   m_Children: []
   m_Father: {fileID: 2112298669}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &1891395230
+--- !u!114 &917298518
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1891395228}
+  m_GameObject: {fileID: 917298516}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: d59ece7b580414f4a919a398170995c4, type: 3}
+  m_Script: {fileID: 11500000, guid: ca8f0a25e604b7b4d9bef9e695a3fa85, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::ChestGenerator
-  chestPrefab: {fileID: 6897359840530728152, guid: 949a3d30037b89f4cae882ee094a3afd, type: 3}
-  chestSpawnSectorSize: 6
+  m_EditorClassIdentifier: Assembly-CSharp::TorchGenerator
+  torchPrefab: {fileID: 2788782464251740857, guid: 2c2bfd9137e117d4193356a215a34cb4, type: 3}
 --- !u!1 &2112298667
 GameObject:
   m_ObjectHideFlags: 0
@@ -292,8 +246,10 @@ MonoBehaviour:
   height: 20
   cellSize: 3
   corridorsNum: 80
+  chestSpawnSectorSize: 6
   playerPrefab: {fileID: 7310383973632660949, guid: eca300bb7904d484e84268c365bbeccf, type: 3}
   wallPrefab: {fileID: 8937452663602260531, guid: 9dda9d6be5bf648408fa4bf68b27549b, type: 3}
+  chestPrefab: {fileID: 6897359840530728152, guid: 949a3d30037b89f4cae882ee094a3afd, type: 3}
 --- !u!4 &2112298669
 Transform:
   m_ObjectHideFlags: 0
@@ -307,8 +263,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
-  - {fileID: 186859822}
-  - {fileID: 1891395229}
+  - {fileID: 917298517}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1660057539 &9223372036854775807
