@@ -1,40 +1,53 @@
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
 public class InventoryGrid : MonoBehaviour
 {
-  [SerializeField] private int numberSlots = 104;
-
-  [SerializeField] private RectTransform inventoryPopup;
-  [SerializeField] private InventorySlot slotPrefab;
   [SerializeField] private InputActionAsset keyAction;
+  [SerializeField] private InventoryPopup inventoryPopup;
+  [SerializeField] private InventorySlot slotPrefab;
+  [SerializeField] private InventoryStorage inventoryStorage;
 
-  private InputAction _toggleInventoryAction;
+  private InputAction toggleInventoryAction;
+
+  private List<InventorySlot> slots;
+
 
   private void Awake()
   {
-    _toggleInventoryAction = keyAction.FindAction("UI/InventoryToggleKey");
+    toggleInventoryAction = keyAction.FindAction("UI/InventoryToggleKey");
+    inventoryPopup.SlotsContainer.constraintCount = inventoryStorage.width;
+    slots = new();
+    for (var x = 0; x < inventoryStorage.width; x++)
+    {
+      for (var y = 0; y < inventoryStorage.height; y++)
+      {
+        InventorySlot slot = Instantiate(slotPrefab, inventoryPopup.SlotsContainer.transform);
+        slot.Constructor(new Vector2Int(x, y));
+        slots.Add(slot);
+      }
+    }
   }
 
   private void OnEnable()
   {
     keyAction.Enable();
-    _toggleInventoryAction.Enable();
-    _toggleInventoryAction.performed += OnToggleInventoryPerformed;
+    toggleInventoryAction.Enable();
+    toggleInventoryAction.performed += OnToggleInventoryPerformed;
+    inventoryStorage.AddItemEvent += OnAddItem;
   }
 
   private void OnDisable()
   {
-    _toggleInventoryAction.performed -= OnToggleInventoryPerformed;
-    _toggleInventoryAction.Disable();
+    toggleInventoryAction.performed -= OnToggleInventoryPerformed;
+    inventoryStorage.AddItemEvent -= OnAddItem;
+    toggleInventoryAction.Disable();
   }
 
   private void Start()
   {
-    for (var x = 0; x < numberSlots; x++)
-    {
-      Instantiate(slotPrefab, inventoryPopup);
-    }
+
   }
 
   private void OnToggleInventoryPerformed(InputAction.CallbackContext context)
@@ -62,5 +75,13 @@ public class InventoryGrid : MonoBehaviour
   {
     Cursor.lockState = CursorLockMode.Locked;
     Cursor.visible = false;
+  }
+
+  private void OnAddItem(Item item)
+  {
+    print($"instantiate {item.ImagePrefab.name}");
+    print($"slots leng = {slots.Count}");
+    InventorySlot slot = slots.Find((slot) => slot.Position == item.Position);
+    Instantiate(item.ImagePrefab, slot.transform);
   }
 }
