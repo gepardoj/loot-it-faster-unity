@@ -18,6 +18,7 @@ namespace StarterAssets
 		public float SprintSpeed = 6.0f;
 		[Tooltip("Rotation speed of the character")]
 		public float RotationSpeed = 1.0f;
+		public bool canRotate = true;
 		[Tooltip("Acceleration and deceleration")]
 		public float SpeedChangeRate = 10.0f;
 
@@ -64,7 +65,7 @@ namespace StarterAssets
 		private float _jumpTimeoutDelta;
 		private float _fallTimeoutDelta;
 
-	
+
 #if ENABLE_INPUT_SYSTEM
 		private PlayerInput _playerInput;
 #endif
@@ -78,11 +79,11 @@ namespace StarterAssets
 		{
 			get
 			{
-				#if ENABLE_INPUT_SYSTEM
+#if ENABLE_INPUT_SYSTEM
 				return _playerInput.currentControlScheme == "KeyboardMouse";
-				#else
+#else
 				return false;
-				#endif
+#endif
 			}
 		}
 
@@ -132,11 +133,11 @@ namespace StarterAssets
 		private void CameraRotation()
 		{
 			// if there is an input
-			if (_input.look.sqrMagnitude >= _threshold)
+			if (_input.look.sqrMagnitude >= _threshold && canRotate)
 			{
 				//Don't multiply mouse input by Time.deltaTime
 				float deltaTimeMultiplier = IsCurrentDeviceMouse ? 1.0f : Time.deltaTime;
-				
+
 				_cinemachineTargetPitch += _input.look.y * RotationSpeed * deltaTimeMultiplier;
 				_rotationVelocity = _input.look.x * RotationSpeed * deltaTimeMultiplier;
 

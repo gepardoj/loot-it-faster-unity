@@ -164,7 +164,8 @@ public class MazeGenerator : MonoBehaviour
           if (cell == CellType.Player)
           {
             var pos = new Vector3(x * cellSize, -cellSize / 2f, y * cellSize);
-            Instantiate(playerPrefab, pos, Quaternion.identity, transform);
+            // Instantiate(playerPrefab, pos, Quaternion.identity, transform);
+            playerPrefab.transform.SetPositionAndRotation(pos, Quaternion.identity);
             // Instantiate(torchPrefab, pos, Quaternion.identity, transform);
           }
         }

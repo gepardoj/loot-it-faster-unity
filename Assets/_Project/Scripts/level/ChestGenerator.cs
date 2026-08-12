@@ -78,6 +78,7 @@ public class ChestGenerator : MonoBehaviour, ILevelGenerator
             chestPrefab.name = $"chest dx = {dx}, dy = {dy}";
             if (dx == 1) rotation = Quaternion.Euler(new Vector3(0, 180, 0));
             else if (dx == 0) rotation = Quaternion.Euler(new Vector3(0, -90, 0));
+            else if (dx == 0 && dy == 1) rotation = Quaternion.Euler(new Vector3(0, 90, 0));
             else if (dx == -1) rotation = Quaternion.Euler(new Vector3(0, 0, 0));
           }
           catch (Exception)

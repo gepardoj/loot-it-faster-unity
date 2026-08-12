@@ -1,10 +1,13 @@
 using System.Collections.Generic;
+using StarterAssets;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
 public class InventoryGrid : MonoBehaviour
 {
   [SerializeField] private InputActionAsset keyAction;
+  [SerializeField] private FirstPersonController fpsController;
+  [SerializeField] private StarterAssetsInputs input;
   [SerializeField] private InventoryPopup inventoryPopup;
   [SerializeField] private InventorySlot slotPrefab;
   [SerializeField] private InventoryStorage inventoryStorage;
@@ -67,12 +70,15 @@ public class InventoryGrid : MonoBehaviour
 
   private void OpenInventory()
   {
+    fpsController.canRotate = false;
     Cursor.lockState = CursorLockMode.None;
     Cursor.visible = true;
   }
 
   private void CloseInventory()
   {
+    fpsController.canRotate = true;
+    input.cursorInputForLook = true;
     Cursor.lockState = CursorLockMode.Locked;
     Cursor.visible = false;
   }
