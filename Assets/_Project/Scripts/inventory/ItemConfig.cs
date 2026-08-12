@@ -6,7 +6,7 @@ public class ItemConfig : ScriptableObject
 {
   [SerializeField] private ItemType type;
   [SerializeField] private Vector2Int[] shape;
-  [SerializeField] private GameObject imgPrefab;
+  [SerializeField] private ItemImage imgPrefab;
 
   public virtual Item CreateItem()
   {

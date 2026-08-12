@@ -14,14 +14,16 @@ public class Item
     public ItemType Type { get; private set; }
     public Vector2Int Position { get; private set; }
     public Vector2Int[] Shape { get; private set; }
-    public GameObject ImagePrefab { get; private set; }
+    // TODO: replace to Id
+    public ItemImage ImagePrefab { get; private set; }
 
-    public Item(ItemType type, Vector2Int[] shape, GameObject imagePrefab)
+    public Item(ItemType type, Vector2Int[] shape, ItemImage imagePrefab)
     {
         Id = idCounter++;
         Type = type;
         Shape = shape;
         ImagePrefab = imagePrefab;
+        ImagePrefab.Id = Id;
     }
 
     public void SetPosition(Vector2Int position)

@@ -22,15 +22,26 @@ public class InventoryGrid : MonoBehaviour
     toggleInventoryAction = keyAction.FindAction("UI/InventoryToggleKey");
     inventoryPopup.SlotsContainer.constraintCount = inventoryStorage.width;
     slots = new();
-    for (var x = 0; x < inventoryStorage.width; x++)
+    for (var y = 0; y < inventoryStorage.height; y++)
     {
-      for (var y = 0; y < inventoryStorage.height; y++)
+      for (var x = 0; x < inventoryStorage.width; x++)
       {
         InventorySlot slot = Instantiate(slotPrefab, inventoryPopup.SlotsContainer.transform);
         slot.Constructor(new Vector2Int(x, y));
+        slot.OnDropItemImage += OnDropItemImage;
         slots.Add(slot);
       }
     }
+  }
+
+  private bool? OnDropItemImage(ItemImage itemImage, Vector2Int pos)
+  {
+    if (inventoryStorage.CanPutItem(itemImage.Id, pos))
+    {
+      inventoryStorage.PutItem(itemImage.Id, pos);
+      return true;
+    }
+    return false;
   }
 
   private void OnEnable()
@@ -46,11 +57,6 @@ public class InventoryGrid : MonoBehaviour
     toggleInventoryAction.performed -= OnToggleInventoryPerformed;
     inventoryStorage.AddItemEvent -= OnAddItem;
     toggleInventoryAction.Disable();
-  }
-
-  private void Start()
-  {
-
   }
 
   private void OnToggleInventoryPerformed(InputAction.CallbackContext context)
