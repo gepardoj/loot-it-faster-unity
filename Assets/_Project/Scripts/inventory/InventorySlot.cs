@@ -19,13 +19,11 @@ public class InventorySlot : MonoBehaviour, IDropHandler
     && eventData.pointerDrag.TryGetComponent<ItemImage>(out var draggedItem)
     )
     {
-      print($"{draggedItem.name} was dropped at x = {Position.x} y = {Position.y}");
       if (OnDropItemImage?.Invoke(draggedItem, Position) ?? false)
       {
         draggedItem.transform.SetParent(transform);
         draggedItem.rectTransform.anchoredPosition = Vector2.zero;
       }
     }
-    print("on drop has ended");
   }
 }

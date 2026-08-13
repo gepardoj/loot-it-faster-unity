@@ -12,8 +12,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 93148329ea700d94eb98270fea0e03b2, type: 3}
   m_Name: lockpick
   m_EditorClassIdentifier: Assembly-CSharp::ItemShapeConfig
-  type: 0
-  shape:
+  <Type>k__BackingField: 0
+  <Shape>k__BackingField:
   - {x: 0, y: 0}
   - {x: 0, y: 1}
-  imgPrefab: {fileID: -7973303720987787907, guid: 84bb441b1620cc746b7dfbaa131f6dd0, type: 3}
+  <ImgPrefab>k__BackingField: {fileID: -7973303720987787907, guid: 84bb441b1620cc746b7dfbaa131f6dd0, type: 3}

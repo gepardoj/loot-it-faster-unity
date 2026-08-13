@@ -4,12 +4,7 @@ using UnityEngine;
 [CreateAssetMenu(fileName = "item config", menuName = "game/items/item config")]
 public class ItemConfig : ScriptableObject
 {
-  [SerializeField] private ItemType type;
-  [SerializeField] private Vector2Int[] shape;
-  [SerializeField] private ItemImage imgPrefab;
-
-  public virtual Item CreateItem()
-  {
-    return new Item(type, shape, imgPrefab);
-  }
+  [field: SerializeField] public ItemType Type { get; private set; }
+  [field: SerializeField] public Vector2Int[] Shape { get; private set; }
+  [field: SerializeField] public ItemImage ImgPrefab { get; private set; }
 }

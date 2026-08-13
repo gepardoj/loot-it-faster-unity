@@ -36,9 +36,9 @@ public class InventoryGrid : MonoBehaviour
 
   private bool? OnDropItemImage(ItemImage itemImage, Vector2Int pos)
   {
-    if (inventoryStorage.CanPutItem(itemImage.Id, pos))
+    if (inventoryStorage.CanPutItem(itemImage.ItemId, pos))
     {
-      inventoryStorage.PutItem(itemImage.Id, pos);
+      inventoryStorage.MoveItemTo(itemImage.ItemId, pos);
       return true;
     }
     return false;
@@ -91,9 +91,7 @@ public class InventoryGrid : MonoBehaviour
 
   private void OnAddItem(Item item)
   {
-    print($"instantiate {item.ImagePrefab.name}");
-    print($"slots leng = {slots.Count}");
     InventorySlot slot = slots.Find((slot) => slot.Position == item.Position);
-    Instantiate(item.ImagePrefab, slot.transform);
+    inventoryStorage.ItemFactory.InstantiateItemImage(item, slot.transform);
   }
 }
