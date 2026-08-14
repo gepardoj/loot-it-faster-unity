@@ -13,6 +13,7 @@ public class Item
     public int Id { get; private set; }
     public ItemType Type { get; private set; }
     public Vector2Int Position { get; private set; }
+    // TODO: not necessary to keep `Shape` in each instance, we can look for a config in ItemFactory by item's Type
     public Vector2Int[] Shape { get; private set; }
 
     public Item(ItemType type, Vector2Int[] shape)
@@ -22,9 +23,8 @@ public class Item
         Shape = shape;
     }
 
-    public void SetPosition(Vector2Int position)
+    public void SetPosition(Vector2Int pos)
     {
-        Position = position;
+        Position = pos;
     }
-
 }

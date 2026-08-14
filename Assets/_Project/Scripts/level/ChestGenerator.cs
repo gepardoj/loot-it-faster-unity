@@ -5,7 +5,7 @@ using Random = UnityEngine.Random;
 
 public class ChestGenerator : MonoBehaviour, ILevelGenerator
 {
-  private static float CHEST_OFFSET = 1f;
+  private const float CHEST_OFFSET = 1f;
 
   [SerializeField] private GameObject chestPrefab;
 
@@ -67,7 +67,7 @@ public class ChestGenerator : MonoBehaviour, ILevelGenerator
       for (int y = 0; y < maze.Height; y++)
       {
         var cell = maze.Grid[x, y];
-        if (cell == CellType.Empty && Random.Range(1, 10) == 1)
+        if (cell == CellType.Player || (cell == CellType.Empty && Random.Range(1, 15) == 1))
         {
           Vector3 pos;
           var rotation = Quaternion.identity;
@@ -77,8 +77,8 @@ public class ChestGenerator : MonoBehaviour, ILevelGenerator
             pos = new Vector3(x * maze.CellSize + dx * CHEST_OFFSET, -maze.CellSize / 2f, y * maze.CellSize + dy * CHEST_OFFSET);
             chestPrefab.name = $"chest dx = {dx}, dy = {dy}";
             if (dx == 1) rotation = Quaternion.Euler(new Vector3(0, 180, 0));
-            else if (dx == 0) rotation = Quaternion.Euler(new Vector3(0, -90, 0));
             else if (dx == 0 && dy == 1) rotation = Quaternion.Euler(new Vector3(0, 90, 0));
+            else if (dx == 0) rotation = Quaternion.Euler(new Vector3(0, -90, 0));
             else if (dx == -1) rotation = Quaternion.Euler(new Vector3(0, 0, 0));
           }
           catch (Exception)

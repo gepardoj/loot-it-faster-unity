@@ -3,11 +3,14 @@ using UnityEngine;
 
 public class ItemFactory : MonoBehaviour
 {
+    public static ItemFactory Instance { get; private set; }
     [SerializeField] private ItemConfig[] _configs;
     private Dictionary<ItemType, ItemConfig> _configMap = new();
 
-    private void Start()
+
+    private void Awake()
     {
+        Instance = this;
         foreach (var config in _configs)
         {
             _configMap.Add(config.Type, config);

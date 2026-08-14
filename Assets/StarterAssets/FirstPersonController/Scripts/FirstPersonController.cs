@@ -18,7 +18,8 @@ namespace StarterAssets
 		public float SprintSpeed = 6.0f;
 		[Tooltip("Rotation speed of the character")]
 		public float RotationSpeed = 1.0f;
-		public bool canRotate = true;
+		public bool CanMove { get; set; } = true;
+		public bool CanRotate { get; set; } = true;
 		[Tooltip("Acceleration and deceleration")]
 		public float SpeedChangeRate = 10.0f;
 
@@ -115,12 +116,12 @@ namespace StarterAssets
 		{
 			JumpAndGravity();
 			GroundedCheck();
-			Move();
+			if (CanMove) Move();
 		}
 
 		private void LateUpdate()
 		{
-			CameraRotation();
+			if (CanRotate) CameraRotation();
 		}
 
 		private void GroundedCheck()
@@ -133,7 +134,7 @@ namespace StarterAssets
 		private void CameraRotation()
 		{
 			// if there is an input
-			if (_input.look.sqrMagnitude >= _threshold && canRotate)
+			if (_input.look.sqrMagnitude >= _threshold)
 			{
 				//Don't multiply mouse input by Time.deltaTime
 				float deltaTimeMultiplier = IsCurrentDeviceMouse ? 1.0f : Time.deltaTime;

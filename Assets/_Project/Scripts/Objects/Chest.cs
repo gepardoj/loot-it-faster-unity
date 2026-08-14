@@ -1,0 +1,21 @@
+using UnityEngine;
+
+public class Chest : MonoBehaviour
+{
+    [field: SerializeField] public int Width { get; private set; } = 8;
+    [field: SerializeField] public int Height { get; private set; } = 5;
+
+    public Storage Storage { get; private set; }
+
+
+    private void Start()
+    {
+        Storage = new(Width, Height);
+        Storage.GenerateLoot();
+    }
+
+    public void Open()
+    {
+        InventoryGrid.Instance.OpenExternalStorage(Storage);
+    }
+}

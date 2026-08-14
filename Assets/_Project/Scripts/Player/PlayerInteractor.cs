@@ -1,0 +1,53 @@
+using UnityEngine;
+using UnityEngine.InputSystem;
+
+[RequireComponent(typeof(Camera))]
+public class PlayerInteractor : MonoBehaviour
+{
+  private Camera _cam;
+
+  private InputAction _interactAction;
+  [SerializeField] private InputActionAsset _keyActions;
+  [SerializeField] private float _interactDistance = 2f;
+  [SerializeField] private LayerMask _interactLayer;
+
+
+
+  private void Awake()
+  {
+    _cam = GetComponent<Camera>();
+    _interactAction = _keyActions.FindAction("Player/Interact");
+  }
+
+  private void OnEnable()
+  {
+    _keyActions.Enable();
+    _interactAction.Enable();
+    _interactAction.performed += OnInteract;
+  }
+
+  private void OnDisable()
+  {
+    _interactAction.performed -= OnInteract;
+    _interactAction.Disable();
+  }
+
+  private void OnInteract(InputAction.CallbackContext context)
+  {
+    Ray ray = new(_cam.transform.position, _cam.transform.forward);
+    if (Physics.Raycast(ray, out RaycastHit hit, _interactDistance, _interactLayer))
+    {
+      if (hit.collider.TryGetComponent<Chest>(out var chest))
+      {
+        chest.Open();
+      }
+    }
+  }
+
+  private void OnDrawGizmosSelected()
+  {
+    if (_cam == null) return;
+    Gizmos.color = Color.red;
+    Gizmos.DrawLine(_cam.transform.position, _cam.transform.position + _cam.transform.forward * _interactDistance);
+  }
+}
