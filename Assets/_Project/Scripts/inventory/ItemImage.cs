@@ -10,7 +10,7 @@ public class ItemImage : MonoBehaviour, IDragHandler, IBeginDragHandler, IEndDra
   private Vector2 _originalPosition;
   private Transform _originalParent;
   public int ItemId { get; set; }
-  public event Func<ItemImage, InventorySlot, bool?> OnDropEvent;
+  public event Func<ItemImage, StorageSlot, bool> OnDropEvent;
 
 
   private void Awake()
@@ -23,7 +23,7 @@ public class ItemImage : MonoBehaviour, IDragHandler, IBeginDragHandler, IEndDra
   {
     _originalPosition = _rectTransform.anchoredPosition;
     _originalParent = transform.parent;
-    transform.SetParent(InventoryGrid.Instance.Canvas.transform);
+    transform.SetParent(InventoryManager.Instance.Canvas.transform);
     _canvasGroup.blocksRaycasts = false;
     _canvasGroup.alpha = .6f;
   }
@@ -39,11 +39,11 @@ public class ItemImage : MonoBehaviour, IDragHandler, IBeginDragHandler, IEndDra
     _canvasGroup.alpha = 1;
     if (
       eventData.pointerEnter != null
-      && eventData.pointerEnter.TryGetComponent<InventorySlot>(out var slot)
+      && eventData.pointerEnter.TryGetComponent<StorageSlot>(out var slot)
       && (OnDropEvent?.Invoke(this, slot) ?? false))
     {
       print($"bingo i've got inventory slot with pos {slot.Position}");
-      transform.SetParent(slot.InventoryPopup.ItemsContainer.transform);
+      transform.SetParent(slot.StoragePopup.ItemsContainer.transform);
       SetPosition(slot.Position);
     }
     else
@@ -56,7 +56,7 @@ public class ItemImage : MonoBehaviour, IDragHandler, IBeginDragHandler, IEndDra
   public void SetPosition(Vector2Int pos)
   {
     if (_rectTransform == null) _rectTransform = GetComponent<RectTransform>();
-    _rectTransform.anchoredPosition = new Vector2(pos.x * InventoryGrid.SLOT_SIZE, -pos.y * InventoryGrid.SLOT_SIZE);
+    _rectTransform.anchoredPosition = new Vector2(pos.x * InventoryManager.SLOT_SIZE, -pos.y * InventoryManager.SLOT_SIZE);
   }
 
   public void ClearPosition()

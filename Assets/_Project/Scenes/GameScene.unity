@@ -6088,7 +6088,7 @@ GameObject:
   - component: {fileID: 746997081}
   - component: {fileID: 746997080}
   m_Layer: 0
-  m_Name: InventoryUIManager
+  m_Name: InventoryManager
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -6113,7 +6113,7 @@ MonoBehaviour:
   slotPrefab: {fileID: 5707265509859727910, guid: 942ec035132708e4cbf0485a6cb88892, type: 3}
   <Width>k__BackingField: 8
   <Height>k__BackingField: 10
-  _inventoryPopup: {fileID: 1672746840}
+  _playerStoragePopup: {fileID: 1672746840}
   _externalStoragePopup: {fileID: 1736805195}
 --- !u!4 &746997081
 Transform:
@@ -13835,7 +13835,7 @@ GameObject:
   - component: {fileID: 1672746840}
   - component: {fileID: 1672746841}
   m_Layer: 5
-  m_Name: InventoryPopup
+  m_Name: PlayerStoragePopup
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

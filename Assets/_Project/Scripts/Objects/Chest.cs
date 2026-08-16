@@ -16,6 +16,6 @@ public class Chest : MonoBehaviour
 
     public void Open()
     {
-        InventoryGrid.Instance.OpenExternalStorage(Storage);
+        InventoryManager.Instance.OpenExternalStorage(Storage);
     }
 }
