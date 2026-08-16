@@ -1,14 +1,14 @@
-using System.Collections.Generic;
 using StarterAssets;
 using UnityEngine;
 using UnityEngine.InputSystem;
-using UnityEngine.UI;
 
 public class InventoryGrid : MonoBehaviour
 {
+  public const int SLOT_SIZE = 50;
   public static InventoryGrid Instance { get; private set; }
   private InputAction _toggleInventoryKey;
   private InputAction _closeInventoryKey;
+  [field: SerializeField] public Canvas Canvas { get; private set; }
   [SerializeField] private InputActionAsset _keyActions;
   [SerializeField] private FirstPersonController _fpsController;
   [SerializeField] private StarterAssetsInputs input;
@@ -18,12 +18,10 @@ public class InventoryGrid : MonoBehaviour
   [field: SerializeField] public int Height { get; private set; } = 10;
   [SerializeField] private InventoryPopup _inventoryPopup;
   public Storage InventoryStorage { get; private set; }
-  private List<InventorySlot> _inventorySlots = new();
   // External Storage
-  [SerializeField] private GridLayoutGroup _externalStoragePopup;
+  [SerializeField] private InventoryPopup _externalStoragePopup;
 #nullable enable
   public Storage? ExternalStorage { get; private set; }
-  private List<InventorySlot> _externalSlots = new();
 
 
   private void Awake()
@@ -37,26 +35,26 @@ public class InventoryGrid : MonoBehaviour
   public void OpenExternalStorage(Storage storage)
   {
     ExternalStorage = storage;
-    _externalStoragePopup.constraintCount = storage.Width;
+    _externalStoragePopup.Init(storage.Width);
     // cleanup old slots
-    foreach (Transform child in _externalStoragePopup.transform) Destroy(child.gameObject);
-    _externalSlots.Clear();
+    foreach (Transform child in _externalStoragePopup.SlotsContainer.transform) Destroy(child.gameObject);
+    foreach (Transform child in _externalStoragePopup.ItemsContainer.transform) Destroy(child.gameObject);
     // init new slots
     for (var y = 0; y < storage.Height; y++)
     {
       for (var x = 0; x < storage.Width; x++)
       {
-        InventorySlot slot = Instantiate(slotPrefab, _externalStoragePopup.transform);
-        slot.Constructor(new Vector2Int(x, y));
-        slot.OnDropItemImage += OnExternalSlotDrop;
-        _externalSlots.Add(slot);
+        InventorySlot slot = Instantiate(slotPrefab, _externalStoragePopup.SlotsContainer.transform);
+        slot.Constructor(new Vector2Int(x, y), _externalStoragePopup);
         var item = storage.Items.Find(item => item.Position.Equals(new Vector2Int(x, y)));
         if (item != null)
         {
-          ItemFactory.Instance.InstantiateItemImage(item, slot.transform);
+          var itemImg = ItemFactory.Instance.InstantiateItemImage(item, _externalStoragePopup.ItemsContainer);
+          itemImg.OnDropEvent += OnItemImgDrop;
         }
       }
     }
+    _externalStoragePopup.Resize(storage.Width, storage.Height);
     _externalStoragePopup.gameObject.SetActive(true);
     OpenInventory();
   }
@@ -80,48 +78,60 @@ public class InventoryGrid : MonoBehaviour
   private void Start()
   {
     InventoryStorage.GenerateLoot();
-    _inventoryPopup.SlotsContainer.constraintCount = Width;
+    _inventoryPopup.Init(Width);
     for (var y = 0; y < Height; y++)
     {
       for (var x = 0; x < Width; x++)
       {
         InventorySlot slot = Instantiate(slotPrefab, _inventoryPopup.SlotsContainer.transform);
-        slot.Constructor(new Vector2Int(x, y));
-        slot.OnDropItemImage += OnInventorySlotDrop;
-        _inventorySlots.Add(slot);
+        slot.Constructor(new Vector2Int(x, y), _inventoryPopup);
         var item = InventoryStorage.Items.Find(item => item.Position.Equals(new Vector2Int(x, y)));
         if (item != null)
         {
-          ItemFactory.Instance.InstantiateItemImage(item, slot.transform);
+          var itemImg = ItemFactory.Instance.InstantiateItemImage(item, _inventoryPopup.ItemsContainer);
+          itemImg.OnDropEvent += OnItemImgDrop;
         }
       }
     }
+    _inventoryPopup.Resize(Width, Height);
   }
 
-  private bool? OnExternalSlotDrop(ItemImage itemImage, Vector2Int pos)
+  private bool? OnItemImgDrop(ItemImage itemImage, InventorySlot slot)
   {
-    if (ExternalStorage == null) throw new System.Exception();
-    var inventoryItem = InventoryStorage.Items.Find(item => item.Id == itemImage.ItemId);
-    if (inventoryItem != null)
+    if (slot.InventoryPopup == _inventoryPopup) // item was dropped at Player's Inventory slot
     {
-      return ExternalStorage.TryTransferItem(InventoryStorage, itemImage.ItemId, pos);
+      return OnInventorySlotDrop(itemImage, slot.Position);
     }
-    else
+    else if (slot.InventoryPopup == _externalStoragePopup) // item was dropped at External Storage, like Chest
     {
-      return ExternalStorage.TryMoveItemTo(itemImage.ItemId, pos);
+      return OnExternalSlotDrop(itemImage, slot.Position);
     }
+    else throw new System.Exception($"couldn't determine where item was dropped");
   }
 
   private bool? OnInventorySlotDrop(ItemImage itemImage, Vector2Int pos)
   {
     var externalItem = ExternalStorage?.Items.Find(item => item.Id == itemImage.ItemId);
-    if (externalItem != null)
+    if (externalItem != null) // moves from External Storage to Player's Inventory
     {
       return InventoryStorage.TryTransferItem(ExternalStorage, itemImage.ItemId, pos);
     }
-    else
+    else // moves inside Player's Inventory
     {
       return InventoryStorage.TryMoveItemTo(itemImage.ItemId, pos);
+    }
+  }
+  private bool? OnExternalSlotDrop(ItemImage itemImage, Vector2Int pos)
+  {
+    if (ExternalStorage == null) throw new System.Exception();
+    var inventoryItem = InventoryStorage.Items.Find(item => item.Id == itemImage.ItemId);
+    if (inventoryItem != null) // moves from Player's Inventory to External Storage
+    {
+      return ExternalStorage.TryTransferItem(InventoryStorage, itemImage.ItemId, pos);
+    }
+    else // moves inside External Storage
+    {
+      return ExternalStorage.TryMoveItemTo(itemImage.ItemId, pos);
     }
   }
 

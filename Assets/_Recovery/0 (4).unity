@@ -35,7 +35,7 @@ RenderSettings:
   m_DefaultReflectionMode: 0
   m_DefaultReflectionResolution: 128
   m_ReflectionBounces: 1
-  m_ReflectionIntensity: 0
+  m_ReflectionIntensity: 0.22
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 0}
   m_UseRadianceAmbientProbe: 0
@@ -6106,7 +6106,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 05ba090fe02c4c8449a212dbc0d4c195, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::InventoryGrid
-  <Canvas>k__BackingField: {fileID: 1362497570}
   _keyActions: {fileID: -944628639613478452, guid: 4419d82f33d36e848b3ed5af4c8da37e, type: 3}
   _fpsController: {fileID: 1585578816}
   input: {fileID: 1585578811}

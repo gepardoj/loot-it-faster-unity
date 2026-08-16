@@ -120,8 +120,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: bb37750ac7693a34a8fa586de80a92df, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Chest
-  <Width>k__BackingField: 6
-  <Height>k__BackingField: 6
+  <Width>k__BackingField: 8
+  <Height>k__BackingField: 5
 --- !u!65 &-7611480220677283396
 BoxCollider:
   m_ObjectHideFlags: 0

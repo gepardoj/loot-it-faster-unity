@@ -1,41 +1,66 @@
+using System;
 using UnityEngine;
 using UnityEngine.EventSystems;
 
 [RequireComponent(typeof(CanvasGroup))]
 public class ItemImage : MonoBehaviour, IDragHandler, IBeginDragHandler, IEndDragHandler
 {
-  public RectTransform rectTransform;
-  private CanvasGroup canvasGroup;
-  private Transform originalParent;
+  private RectTransform _rectTransform;
+  private CanvasGroup _canvasGroup;
+  private Vector2 _originalPosition;
+  private Transform _originalParent;
   public int ItemId { get; set; }
+  public event Func<ItemImage, InventorySlot, bool?> OnDropEvent;
+
 
   private void Awake()
   {
-    rectTransform = GetComponent<RectTransform>();
-    canvasGroup = GetComponent<CanvasGroup>();
+    _rectTransform = GetComponent<RectTransform>();
+    _canvasGroup = GetComponent<CanvasGroup>();
   }
 
   public void OnBeginDrag(PointerEventData eventData)
   {
-    originalParent = transform.parent;
-    transform.SetParent(transform.root);
-    canvasGroup.blocksRaycasts = false;
-    canvasGroup.alpha = .6f;
+    _originalPosition = _rectTransform.anchoredPosition;
+    _originalParent = transform.parent;
+    transform.SetParent(InventoryGrid.Instance.Canvas.transform);
+    _canvasGroup.blocksRaycasts = false;
+    _canvasGroup.alpha = .6f;
   }
 
   public void OnDrag(PointerEventData eventData)
   {
-    rectTransform.anchoredPosition += eventData.delta / transform.root.localScale.x;
+    _rectTransform.anchoredPosition += eventData.delta / transform.root.localScale.x;
   }
 
   public void OnEndDrag(PointerEventData eventData)
   {
-    canvasGroup.blocksRaycasts = true;
-    canvasGroup.alpha = 1;
-    if (transform.root == transform.parent)
+    _canvasGroup.blocksRaycasts = true;
+    _canvasGroup.alpha = 1;
+    if (
+      eventData.pointerEnter != null
+      && eventData.pointerEnter.TryGetComponent<InventorySlot>(out var slot)
+      && (OnDropEvent?.Invoke(this, slot) ?? false))
     {
-      transform.SetParent(originalParent);
-      rectTransform.anchoredPosition = Vector2.zero;
+      print($"bingo i've got inventory slot with pos {slot.Position}");
+      transform.SetParent(slot.InventoryPopup.ItemsContainer.transform);
+      SetPosition(slot.Position);
     }
+    else
+    {
+      transform.SetParent(_originalParent);
+      ClearPosition();
+    }
+  }
+
+  public void SetPosition(Vector2Int pos)
+  {
+    if (_rectTransform == null) _rectTransform = GetComponent<RectTransform>();
+    _rectTransform.anchoredPosition = new Vector2(pos.x * InventoryGrid.SLOT_SIZE, -pos.y * InventoryGrid.SLOT_SIZE);
+  }
+
+  public void ClearPosition()
+  {
+    _rectTransform.anchoredPosition = _originalPosition;
   }
 }

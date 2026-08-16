@@ -30,10 +30,12 @@ public class ItemFactory : MonoBehaviour
         return new Item(config.Type, config.Shape);
     }
 
-    public void InstantiateItemImage(Item item, Transform parentTransform)
+    public ItemImage InstantiateItemImage(Item item, Transform parentTransform)
     {
         var config = Get(item.Type);
-        var img = Instantiate(config.ImgPrefab, parentTransform);
-        img.ItemId = item.Id;
+        var itemImg = Instantiate(config.ImgPrefab, parentTransform);
+        itemImg.SetPosition(item.Position);
+        itemImg.ItemId = item.Id;
+        return itemImg;
     }
 }

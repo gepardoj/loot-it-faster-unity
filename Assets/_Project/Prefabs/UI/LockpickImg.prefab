@@ -12,6 +12,7 @@ GameObject:
   - component: {fileID: 5721845329037487202}
   - component: {fileID: 7966409273610879059}
   - component: {fileID: -7973303720987787907}
+  - component: {fileID: 2282382565190451542}
   m_Layer: 5
   m_Name: LockpickImg
   m_TagString: Untagged
@@ -88,3 +89,16 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b8de6749045587e44af0f16ab10494de, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::ItemImage
+  rectTransform: {fileID: 0}
+--- !u!225 &2282382565190451542
+CanvasGroup:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2280047877181609603}
+  m_Enabled: 1
+  m_Alpha: 1
+  m_Interactable: 1
+  m_BlocksRaycasts: 1
+  m_IgnoreParentGroups: 0
