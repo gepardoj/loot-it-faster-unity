@@ -1,4 +1,3 @@
-using StarterAssets;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
@@ -6,12 +5,7 @@ public class InventoryManager : MonoBehaviour
 {
   public const int SLOT_SIZE = 50;
   public static InventoryManager Instance { get; private set; }
-  private InputAction _toggleInventoryKey;
-  private InputAction _closeInventoryKey;
   [field: SerializeField] public Canvas Canvas { get; private set; }
-  [SerializeField] private InputActionAsset _keyActions;
-  [SerializeField] private FirstPersonController _fpsController;
-  [SerializeField] private StarterAssetsInputs input;
   [SerializeField] private StorageSlot slotPrefab;
   // Player's Storage
   [field: SerializeField] public int Width { get; private set; } = 8;
@@ -28,8 +22,6 @@ public class InventoryManager : MonoBehaviour
   {
     Instance = this;
     PlayerStorage = new(Width, Height);
-    _toggleInventoryKey = _keyActions.FindAction("Player/Inventory");
-    _closeInventoryKey = _keyActions.FindAction("Player/Cancel");
   }
 
   private void InitStorage(Storage storage, StoragePopup storagePopup)
@@ -58,6 +50,11 @@ public class InventoryManager : MonoBehaviour
 
   public void OpenExternalStorage(Storage storage)
   {
+    if (_externalStoragePopup.gameObject.activeSelf)
+    {
+      CloseInventory();
+      return;
+    }
     ExternalStorage = storage;
     InitStorage(ExternalStorage, _externalStoragePopup);
     _externalStoragePopup.gameObject.SetActive(true);
@@ -66,18 +63,14 @@ public class InventoryManager : MonoBehaviour
 
   private void OnEnable()
   {
-    _keyActions.Enable();
-    _toggleInventoryKey.Enable();
-    _toggleInventoryKey.performed += OnToggleInventory;
-    _closeInventoryKey.performed += OnCloseInventory;
+    InputManager.Instance.InputActions.UI.Inventory.performed += OnToggleInventory;
+    InputManager.Instance.InputActions.UI.Cancel.performed += OnCloseInventory;
   }
 
   private void OnDisable()
   {
-    _toggleInventoryKey.performed -= OnToggleInventory;
-    _toggleInventoryKey.Disable();
-    _closeInventoryKey.performed -= OnCloseInventory;
-    _closeInventoryKey.Disable();
+    InputManager.Instance.InputActions.UI.Inventory.performed -= OnToggleInventory;
+    InputManager.Instance.InputActions.UI.Cancel.performed -= OnCloseInventory;
   }
 
   private void Start()
@@ -147,8 +140,7 @@ public class InventoryManager : MonoBehaviour
   private void OpenInventory()
   {
     _playerStoragePopup.gameObject.SetActive(true);
-    _fpsController.CanMove = false;
-    _fpsController.CanRotate = false;
+    InputManager.Instance.InputActions.Player.Disable();
     Cursor.lockState = CursorLockMode.None;
     Cursor.visible = true;
   }
@@ -157,9 +149,7 @@ public class InventoryManager : MonoBehaviour
   {
     _playerStoragePopup.gameObject.SetActive(false);
     _externalStoragePopup.gameObject.SetActive(false);
-    _fpsController.CanMove = true;
-    _fpsController.CanRotate = true;
-    input.cursorInputForLook = true;
+    InputManager.Instance.InputActions.Player.Enable();
     Cursor.lockState = CursorLockMode.Locked;
     Cursor.visible = false;
   }

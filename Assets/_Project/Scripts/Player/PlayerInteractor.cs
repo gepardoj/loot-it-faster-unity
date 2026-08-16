@@ -6,7 +6,6 @@ public class PlayerInteractor : MonoBehaviour
 {
   private Camera _cam;
 
-  private InputAction _interactAction;
   [SerializeField] private InputActionAsset _keyActions;
   [SerializeField] private float _interactDistance = 2f;
   [SerializeField] private LayerMask _interactLayer;
@@ -16,20 +15,16 @@ public class PlayerInteractor : MonoBehaviour
   private void Awake()
   {
     _cam = GetComponent<Camera>();
-    _interactAction = _keyActions.FindAction("Player/Interact");
   }
 
   private void OnEnable()
   {
-    _keyActions.Enable();
-    _interactAction.Enable();
-    _interactAction.performed += OnInteract;
+    InputManager.Instance.InputActions.UI.Interact.performed += OnInteract;
   }
 
   private void OnDisable()
   {
-    _interactAction.performed -= OnInteract;
-    _interactAction.Disable();
+    InputManager.Instance.InputActions.UI.Interact.performed -= OnInteract;
   }
 
   private void OnInteract(InputAction.CallbackContext context)
