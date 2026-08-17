@@ -97,6 +97,11 @@ public class Storage
     {
         var item = origin._items.Find(item => item.Id == id);
         if (item == null) return false;
+        return CanMoveItemTo(item, pos);
+    }
+
+    private bool CanMoveItemTo(Item item, Vector2Int pos)
+    {
         foreach (var offset in item.Shape)
         {
             var x = pos.x + offset.x;
@@ -126,6 +131,18 @@ public class Storage
             var item = origin._items.Find(item => item.Id == id);
             origin._items.Remove(item);
             origin.CleanGridAfterItem(item);
+            _items.Add(item);
+            PutItemTo(item, pos);
+            return true;
+        }
+        return false;
+    }
+
+    // moving item from buffer (e.g. picking up a lockpick from 3d world)
+    public bool TryTransferItemFromBuffer(Item item, Vector2Int pos)
+    {
+        if (CanMoveItemTo(item, pos))
+        {
             _items.Add(item);
             PutItemTo(item, pos);
             return true;

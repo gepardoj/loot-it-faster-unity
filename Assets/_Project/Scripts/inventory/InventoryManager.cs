@@ -19,12 +19,21 @@ public class InventoryManager : MonoBehaviour
   public Storage? ExternalStorage { get; private set; }
 
   private List<WorldItem> WorldItems { get; set; } = new();
+  private Item? _bufferItem;
 
 
   private void Awake()
   {
     Instance = this;
     PlayerStorage = new(Width, Height);
+  }
+
+  public ItemImage CreateBufferItem(ItemType itemType)
+  {
+    var item = ItemFactory.Instance.CreateItem(itemType);
+    _bufferItem = item;
+    var itemImage = ItemFactory.Instance.InstantiateItemImage(item, Canvas.transform, OnItemImgDrop);
+    return itemImage;
   }
 
   public bool TryTransferItemFromInventoryToWorld(ItemImage itemImage, Transform parent, out WorldItem? worldItem)
@@ -62,8 +71,7 @@ public class InventoryManager : MonoBehaviour
         var item = storage.FindItemByPosition(new Vector2Int(x, y));
         if (item != null)
         {
-          var itemImg = ItemFactory.Instance.InstantiateItemImage(item, storagePopup.ItemsContainer);
-          itemImg.OnDropEvent += OnItemImgDrop;
+          ItemFactory.Instance.InstantiateItemImage(item, storagePopup.ItemsContainer, OnItemImgDrop);
         }
       }
     }
@@ -103,42 +111,48 @@ public class InventoryManager : MonoBehaviour
 
   private bool OnItemImgDrop(ItemImage itemImage, StorageSlot slot)
   {
+    var inventoryItem = PlayerStorage.FindItemById(itemImage.ItemId);
+    var externalItem = ExternalStorage?.FindItemById(itemImage.ItemId);
+
     if (slot.StoragePopup == _playerStoragePopup) // item was dropped at Player's Inventory slot
     {
-      return OnInventorySlotDrop(itemImage, slot.Position);
+      if (inventoryItem != null) // moves inside Player's Inventory
+      {
+        return PlayerStorage.TryMoveItemTo(itemImage.ItemId, slot.Position);
+      }
+      else if (externalItem != null)
+      {
+        if (ExternalStorage == null) throw new System.Exception($"ExternalStorage should be not null");
+        return PlayerStorage.TryTransferItem(ExternalStorage, itemImage.ItemId, slot.Position);
+      }
+      else if (_bufferItem != null)
+      {
+        var result = PlayerStorage.TryTransferItemFromBuffer(_bufferItem, slot.Position);
+        _bufferItem = null;
+        return result;
+      }
+      else throw new System.Exception($"couldn't find any item");
     }
     else if (slot.StoragePopup == _externalStoragePopup) // item was dropped at External Storage, like Chest
     {
-      return OnExternalSlotDrop(itemImage, slot.Position);
+      if (ExternalStorage == null) throw new System.Exception($"ExternalStorage should be not null");
+      if (inventoryItem != null) // moves from Player's Inventory to External Storage
+      {
+        return ExternalStorage.TryTransferItem(PlayerStorage, itemImage.ItemId, slot.Position);
+      }
+      else if (externalItem != null) // moves inside External Storage
+      {
+        return ExternalStorage.TryMoveItemTo(itemImage.ItemId, slot.Position);
+      }
+      else if (_bufferItem != null)
+      {
+        var result = ExternalStorage.TryTransferItemFromBuffer(_bufferItem, slot.Position);
+        _bufferItem = null;
+        return result;
+      }
+      else throw new System.Exception($"couldn't find any item");
     }
     else throw new System.Exception($"couldn't determine where item was dropped");
-  }
-
-  private bool OnInventorySlotDrop(ItemImage itemImage, Vector2Int pos)
-  {
-    var externalItem = ExternalStorage?.FindItemById(itemImage.ItemId);
-    if (externalItem != null) // moves from External Storage to Player's Inventory
-    {
-      if (ExternalStorage == null) throw new System.Exception($"ExternalStorage should be not null");
-      return PlayerStorage.TryTransferItem(ExternalStorage, itemImage.ItemId, pos);
-    }
-    else // moves inside Player's Inventory
-    {
-      return PlayerStorage.TryMoveItemTo(itemImage.ItemId, pos);
-    }
-  }
-  private bool OnExternalSlotDrop(ItemImage itemImage, Vector2Int pos)
-  {
-    if (ExternalStorage == null) throw new System.Exception();
-    var inventoryItem = PlayerStorage.FindItemById(itemImage.ItemId);
-    if (inventoryItem != null) // moves from Player's Inventory to External Storage
-    {
-      return ExternalStorage.TryTransferItem(PlayerStorage, itemImage.ItemId, pos);
-    }
-    else // moves inside External Storage
-    {
-      return ExternalStorage.TryMoveItemTo(itemImage.ItemId, pos);
-    }
   }
 
   private void OnToggleInventory(InputAction.CallbackContext context)
@@ -165,7 +179,6 @@ public class InventoryManager : MonoBehaviour
     _playerStoragePopup.gameObject.SetActive(true);
     InputManager.Instance.InputActions.Player.Disable();
     Cursor.lockState = CursorLockMode.None;
-    Cursor.visible = true;
   }
 
   public void CloseInventory()
@@ -174,6 +187,5 @@ public class InventoryManager : MonoBehaviour
     _externalStoragePopup.gameObject.SetActive(false);
     InputManager.Instance.InputActions.Player.Enable();
     Cursor.lockState = CursorLockMode.Locked;
-    Cursor.visible = false;
   }
 }

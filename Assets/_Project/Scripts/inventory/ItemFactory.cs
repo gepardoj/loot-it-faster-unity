@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -17,7 +18,7 @@ public class ItemFactory : MonoBehaviour
         }
     }
 
-    public ItemConfig Get(ItemType type)
+    public ItemConfig GetItemConfig(ItemType type)
     {
         var found = _configMap.TryGetValue(type, out var config);
         if (found == false) throw new System.Exception($"The config has not found of type {type}");
@@ -26,22 +27,23 @@ public class ItemFactory : MonoBehaviour
 
     public Item CreateItem(ItemType type)
     {
-        var config = Get(type);
+        var config = GetItemConfig(type);
         return new Item(config.Type, config.Shape);
     }
 
-    public ItemImage InstantiateItemImage(Item item, Transform parentTransform)
+    public ItemImage InstantiateItemImage(Item item, Transform parentTransform, Func<ItemImage, StorageSlot, bool> onDropEvent)
     {
-        var config = Get(item.Type);
+        var config = GetItemConfig(item.Type);
         var itemImg = Instantiate(config.ImgPrefab, parentTransform);
         itemImg.SetPosition(item.Position);
         itemImg.ItemId = item.Id;
+        itemImg.OnDropEvent += onDropEvent;
         return itemImg;
     }
 
     public WorldItem InstantiateWorldItem(Item item, Transform parentTransform)
     {
-        var config = Get(item.Type);
+        var config = GetItemConfig(item.Type);
         var worldItem = Instantiate(config.WorldItemPrefab, parentTransform);
         worldItem.SetItem(item);
         return worldItem;

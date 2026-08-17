@@ -10,6 +10,7 @@ public class ItemImage : MonoBehaviour, IDragHandler, IBeginDragHandler, IEndDra
   private Vector2 _originalPosition;
   private Transform _originalParent;
   public int ItemId { get; set; }
+  public WorldItem WorldItem { get; set; }
   public event Func<ItemImage, StorageSlot, bool> OnDropEvent;
 
 
@@ -37,6 +38,8 @@ public class ItemImage : MonoBehaviour, IDragHandler, IBeginDragHandler, IEndDra
   {
     _canvasGroup.blocksRaycasts = true;
     _canvasGroup.alpha = 1;
+    _rectTransform.pivot = new Vector2(0f, 1f);
+
     if ( // item was dropped on slot
       eventData.pointerEnter != null
       && eventData.pointerEnter.TryGetComponent<StorageSlot>(out var slot)
@@ -44,9 +47,18 @@ public class ItemImage : MonoBehaviour, IDragHandler, IBeginDragHandler, IEndDra
     {
       transform.SetParent(slot.StoragePopup.ItemsContainer.transform);
       SetPosition(slot.Position);
+      if (WorldItem != null)
+      {
+        Destroy(WorldItem.gameObject);
+      }
     }
     else // item was dropped outside, or slot is occupied
     {
+      if (WorldItem != null)
+      {
+        WorldItem.gameObject.SetActive(true);
+        Destroy(gameObject);
+      }
       Ray ray = Camera.main.ScreenPointToRay(eventData.position);
       Physics.Raycast(ray, out RaycastHit hit, PlayerInteractor.InteractDistance);
       // if item was consumed (should disappear from inventory) by the 3d game object
