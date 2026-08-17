@@ -6,8 +6,9 @@ public class PlayerInteractor : MonoBehaviour
 {
   private Camera _cam;
 
+  public const float InteractDistance = 2f;
+
   [SerializeField] private InputActionAsset _keyActions;
-  [SerializeField] private float _interactDistance = 2f;
   [SerializeField] private LayerMask _interactLayer;
 
 
@@ -30,7 +31,7 @@ public class PlayerInteractor : MonoBehaviour
   private void OnInteract(InputAction.CallbackContext context)
   {
     Ray ray = new(_cam.transform.position, _cam.transform.forward);
-    if (Physics.Raycast(ray, out RaycastHit hit, _interactDistance, _interactLayer))
+    if (Physics.Raycast(ray, out RaycastHit hit, InteractDistance, _interactLayer))
     {
       if (hit.collider.TryGetComponent<Chest>(out var chest))
       {
@@ -43,6 +44,6 @@ public class PlayerInteractor : MonoBehaviour
   {
     if (_cam == null) return;
     Gizmos.color = Color.red;
-    Gizmos.DrawLine(_cam.transform.position, _cam.transform.position + _cam.transform.forward * _interactDistance);
+    Gizmos.DrawLine(_cam.transform.position, _cam.transform.position + _cam.transform.forward * InteractDistance);
   }
 }

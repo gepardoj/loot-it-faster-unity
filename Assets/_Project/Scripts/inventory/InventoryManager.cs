@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
@@ -11,17 +12,38 @@ public class InventoryManager : MonoBehaviour
   [field: SerializeField] public int Width { get; private set; } = 8;
   [field: SerializeField] public int Height { get; private set; } = 10;
   [SerializeField] private StoragePopup _playerStoragePopup;
-  public Storage PlayerStorage { get; private set; }
+  private Storage PlayerStorage { get; set; }
   // External Storage (like chest)
   [SerializeField] private StoragePopup _externalStoragePopup;
 #nullable enable
   public Storage? ExternalStorage { get; private set; }
+
+  private List<WorldItem> WorldItems { get; set; } = new();
 
 
   private void Awake()
   {
     Instance = this;
     PlayerStorage = new(Width, Height);
+  }
+
+  public bool TryTransferItemFromInventoryToWorld(ItemImage itemImage, Transform parent, out WorldItem? worldItem)
+  {
+    var item = FindItemById(itemImage.ItemId);
+    if (item != null)
+    {
+      PlayerStorage.RemoveItem(item);
+      worldItem = ItemFactory.Instance.InstantiateWorldItem(item, parent);
+      WorldItems.Add(worldItem);
+      return true;
+    }
+    worldItem = null;
+    return false;
+  }
+
+  public Item? FindItemById(int id)
+  {
+    return PlayerStorage.FindItemById(id);
   }
 
   private void InitStorage(Storage storage, StoragePopup storagePopup)
@@ -37,7 +59,7 @@ public class InventoryManager : MonoBehaviour
       {
         StorageSlot slot = Instantiate(slotPrefab, storagePopup.SlotsContainer.transform);
         slot.Constructor(new Vector2Int(x, y), storagePopup);
-        var item = storage.Items.Find(item => item.Position.Equals(new Vector2Int(x, y)));
+        var item = storage.FindItemByPosition(new Vector2Int(x, y));
         if (item != null)
         {
           var itemImg = ItemFactory.Instance.InstantiateItemImage(item, storagePopup.ItemsContainer);
@@ -94,9 +116,10 @@ public class InventoryManager : MonoBehaviour
 
   private bool OnInventorySlotDrop(ItemImage itemImage, Vector2Int pos)
   {
-    var externalItem = ExternalStorage?.Items.Find(item => item.Id == itemImage.ItemId);
+    var externalItem = ExternalStorage?.FindItemById(itemImage.ItemId);
     if (externalItem != null) // moves from External Storage to Player's Inventory
     {
+      if (ExternalStorage == null) throw new System.Exception($"ExternalStorage should be not null");
       return PlayerStorage.TryTransferItem(ExternalStorage, itemImage.ItemId, pos);
     }
     else // moves inside Player's Inventory
@@ -107,7 +130,7 @@ public class InventoryManager : MonoBehaviour
   private bool OnExternalSlotDrop(ItemImage itemImage, Vector2Int pos)
   {
     if (ExternalStorage == null) throw new System.Exception();
-    var inventoryItem = PlayerStorage.Items.Find(item => item.Id == itemImage.ItemId);
+    var inventoryItem = PlayerStorage.FindItemById(itemImage.ItemId);
     if (inventoryItem != null) // moves from Player's Inventory to External Storage
     {
       return ExternalStorage.TryTransferItem(PlayerStorage, itemImage.ItemId, pos);
@@ -145,7 +168,7 @@ public class InventoryManager : MonoBehaviour
     Cursor.visible = true;
   }
 
-  private void CloseInventory()
+  public void CloseInventory()
   {
     _playerStoragePopup.gameObject.SetActive(false);
     _externalStoragePopup.gameObject.SetActive(false);

@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -6,16 +5,17 @@ public class Storage
 {
     public const int EMPTY = -1;
 
-    private readonly int[,] _grid;
     public int Width { get; private set; }
     public int Height { get; private set; }
-    public List<Item> Items { get; private set; } = new();
+    private int[,] _grid;
+    private List<Item> _items;
 
     public Storage(int width, int height)
     {
         Width = width;
         Height = height;
         _grid = new int[width, height];
+        _items = new();
         for (var x = 0; x < width; x++)
         {
             for (var y = 0; y < height; y++)
@@ -27,12 +27,29 @@ public class Storage
 
     public void GenerateLoot()
     {
-        var lockpick = ItemFactory.Instance.CreateItem(ItemType.LOCKPICK);
-        var lockpick2 = ItemFactory.Instance.CreateItem(ItemType.LOCKPICK);
-        Items.Add(lockpick);
-        Items.Add(lockpick2);
+        var lockpick = ItemFactory.Instance.CreateItem(ItemType.Lockpick);
+        var lockpick2 = ItemFactory.Instance.CreateItem(ItemType.Lockpick);
+        _items.Add(lockpick);
+        _items.Add(lockpick2);
         CreateItem(lockpick, new Vector2Int(0, 0));
         CreateItem(lockpick2, new Vector2Int(1, 0));
+    }
+
+    public void RemoveItem(Item item)
+    {
+        CleanGridAfterItem(item);
+        _items.Remove(item);
+    }
+
+#nullable enable
+    public Item? FindItemById(int id)
+    {
+        return _items.Find(item => item.Id == id);
+    }
+
+    public Item? FindItemByPosition(Vector2Int pos)
+    {
+        return _items.Find(item => item.Position.Equals(pos));
     }
 
     private void CleanGridAfterItem(Item item)
@@ -60,7 +77,7 @@ public class Storage
 
     private void MoveItemTo(int id, Vector2Int pos)
     {
-        var item = Items.Find(item => item.Id == id);
+        var item = _items.Find(item => item.Id == id);
         // this two actions of clearing and setting item, it has to be separated, otherwise it can clear each other, if we move the item bellow by 1 step
         if (item.Position.x != -1)
         {   //TODO:we need to use inventory origin pointer. if item came from other source
@@ -78,7 +95,7 @@ public class Storage
 
     private bool CanMoveItemTo(Storage origin, int id, Vector2Int pos)
     {
-        var item = origin.Items.Find(item => item.Id == id);
+        var item = origin._items.Find(item => item.Id == id);
         if (item == null) return false;
         foreach (var offset in item.Shape)
         {
@@ -106,10 +123,10 @@ public class Storage
     {
         if (CanMoveItemTo(origin, id, pos))
         {
-            var item = origin.Items.Find(item => item.Id == id);
-            origin.Items.Remove(item);
+            var item = origin._items.Find(item => item.Id == id);
+            origin._items.Remove(item);
             origin.CleanGridAfterItem(item);
-            Items.Add(item);
+            _items.Add(item);
             PutItemTo(item, pos);
             return true;
         }

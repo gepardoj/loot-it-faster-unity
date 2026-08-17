@@ -38,4 +38,12 @@ public class ItemFactory : MonoBehaviour
         itemImg.ItemId = item.Id;
         return itemImg;
     }
+
+    public WorldItem InstantiateWorldItem(Item item, Transform parentTransform)
+    {
+        var config = Get(item.Type);
+        var worldItem = Instantiate(config.WorldItemPrefab, parentTransform);
+        worldItem.SetItem(item);
+        return worldItem;
+    }
 }

@@ -4,7 +4,7 @@ using UnityEngine;
 [Serializable]
 public enum ItemType
 {
-    LOCKPICK
+    Lockpick
 }
 
 public class Item

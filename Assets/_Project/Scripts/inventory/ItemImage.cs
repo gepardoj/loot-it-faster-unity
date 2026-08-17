@@ -37,19 +37,28 @@ public class ItemImage : MonoBehaviour, IDragHandler, IBeginDragHandler, IEndDra
   {
     _canvasGroup.blocksRaycasts = true;
     _canvasGroup.alpha = 1;
-    if (
+    if ( // item was dropped on slot
       eventData.pointerEnter != null
       && eventData.pointerEnter.TryGetComponent<StorageSlot>(out var slot)
       && (OnDropEvent?.Invoke(this, slot) ?? false))
     {
-      print($"bingo i've got inventory slot with pos {slot.Position}");
       transform.SetParent(slot.StoragePopup.ItemsContainer.transform);
       SetPosition(slot.Position);
     }
-    else
+    else // item was dropped outside, or slot is occupied
     {
-      transform.SetParent(_originalParent);
-      ClearPosition();
+      Ray ray = Camera.main.ScreenPointToRay(eventData.position);
+      Physics.Raycast(ray, out RaycastHit hit, PlayerInteractor.InteractDistance);
+      // if item was consumed (should disappear from inventory) by the 3d game object
+      if (hit.collider != null && hit.collider.TryGetComponent<IItemDropReceiver>(out var obj) && obj.OnDrop(this))
+      {
+        Destroy(gameObject);
+      }
+      else
+      {
+        transform.SetParent(_originalParent);
+        ClearPosition();
+      }
     }
   }
 
