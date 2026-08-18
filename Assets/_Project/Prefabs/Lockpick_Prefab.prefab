@@ -62,7 +62,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 919132149155446097, guid: d0e2ab0ab8d54bf48b77a1ed7b501c6d, type: 3}
       propertyPath: m_Name
-      value: LockpickPrefab
+      value: Lockpick_Prefab
+      objectReference: {fileID: 0}
+    - target: {fileID: 919132149155446097, guid: d0e2ab0ab8d54bf48b77a1ed7b501c6d, type: 3}
+      propertyPath: m_Layer
+      value: 3
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []

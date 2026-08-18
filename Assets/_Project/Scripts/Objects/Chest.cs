@@ -7,6 +7,8 @@ public class Chest : MonoBehaviour
 
     public Storage Storage { get; private set; }
 
+    public bool Locked { get => false; }
+
 
     private void Start()
     {

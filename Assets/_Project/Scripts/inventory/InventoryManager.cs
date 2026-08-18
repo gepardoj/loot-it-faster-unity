@@ -6,6 +6,7 @@ public class InventoryManager : MonoBehaviour
 {
   public const int SLOT_SIZE = 50;
   public static InventoryManager Instance { get; private set; }
+  public bool Open { get; private set; }
   [field: SerializeField] public Canvas Canvas { get; private set; }
   [SerializeField] private StorageSlot slotPrefab;
   // Player's Storage
@@ -176,6 +177,7 @@ public class InventoryManager : MonoBehaviour
 
   private void OpenInventory()
   {
+    Open = true;
     _playerStoragePopup.gameObject.SetActive(true);
     InputManager.Instance.InputActions.Player.Disable();
     Cursor.lockState = CursorLockMode.None;
@@ -183,6 +185,7 @@ public class InventoryManager : MonoBehaviour
 
   public void CloseInventory()
   {
+    Open = false;
     _playerStoragePopup.gameObject.SetActive(false);
     _externalStoragePopup.gameObject.SetActive(false);
     InputManager.Instance.InputActions.Player.Enable();

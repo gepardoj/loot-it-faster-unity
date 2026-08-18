@@ -60,7 +60,7 @@ public class ItemImage : MonoBehaviour, IDragHandler, IBeginDragHandler, IEndDra
         Destroy(gameObject);
       }
       Ray ray = Camera.main.ScreenPointToRay(eventData.position);
-      Physics.Raycast(ray, out RaycastHit hit, PlayerInteractor.InteractDistance);
+      Physics.Raycast(ray, out RaycastHit hit, PlayerInteractor.Instance.InteractDistance);
       // if item was consumed (should disappear from inventory) by the 3d game object
       if (hit.collider != null && hit.collider.TryGetComponent<IItemDropReceiver>(out var obj) && obj.OnDrop(this))
       {
