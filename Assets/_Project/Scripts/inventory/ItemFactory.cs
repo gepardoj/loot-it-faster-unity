@@ -21,7 +21,7 @@ public class ItemFactory : MonoBehaviour
     public ItemConfig GetItemConfig(ItemType type)
     {
         var found = _configMap.TryGetValue(type, out var config);
-        if (found == false) throw new System.Exception($"The config has not found of type {type}");
+        if (found == false) throw new Exception($"The config has not found of type {type}");
         return config;
     }
 

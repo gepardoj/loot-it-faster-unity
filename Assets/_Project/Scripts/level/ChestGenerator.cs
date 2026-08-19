@@ -5,11 +5,18 @@ using Random = UnityEngine.Random;
 
 public class ChestGenerator : MonoBehaviour, ILevelGenerator
 {
+  public static ChestGenerator Instance { get; private set; }
   private const float CHEST_OFFSET = 1f;
 
   [SerializeField] private GameObject chestPrefab;
 
   [SerializeField] private int chestSpawnSectorSize = 6;
+
+
+  private void Awake()
+  {
+    Instance = this;
+  }
 
   public void Generate(MazeGenerator maze)
   {

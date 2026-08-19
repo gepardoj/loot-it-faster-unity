@@ -3,6 +3,8 @@ using UnityEngine.EventSystems;
 
 public class Lockpick : WorldItem, IBeginDragHandler, IDragHandler
 {
+  public ChestLock ChestLock { get => transform.parent.GetComponent<ChestLock>(); }
+
   public void OnBeginDrag(PointerEventData eventData)
   {
     var itemImage = InventoryManager.Instance.CreateBufferItem(ItemType.Lockpick);

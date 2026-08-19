@@ -39,11 +39,11 @@ public class MazeGenerator : MonoBehaviour
   public int PlayerStartY => playerStartY;
 
 
-  void Start()
+  private void Awake()
   {
     GenerateMaze();
     SpawnObjects();
-    var generators = FindObjectsByType<MonoBehaviour>(FindObjectsSortMode.None).OfType<ILevelGenerator>();
+    var generators = GetComponentsInChildren<MonoBehaviour>().OfType<ILevelGenerator>();
     foreach (var gen in generators)
     {
       gen.Generate(this);

@@ -4,6 +4,8 @@ public class ChestLock : MonoBehaviour, IItemDropReceiver
 {
 #nullable enable
   private WorldItem? _lockpick;
+#nullable disable
+  [field: SerializeField] public Chest Chest { get; private set; }
 
   public bool HasLockpick { get => _lockpick != null; }
 
@@ -20,5 +22,12 @@ public class ChestLock : MonoBehaviour, IItemDropReceiver
       InventoryManager.Instance.CloseInventory();
     }
     return result;
+  }
+
+  public void BreakLockpick()
+  {
+    if (_lockpick == null) return;
+    Destroy(_lockpick.gameObject);
+    _lockpick = null;
   }
 }

@@ -28,7 +28,7 @@ public class CursorManager : MonoBehaviour
       Base();
       return;
     }
-    var hold = InputManager.Instance.InputActions.Player.Click.ReadValue<float>();
+    var hold = InputManager.Instance.InputActions.UI.Click.ReadValue<float>();
     var isLock = hit.collider.TryGetComponent<ChestLock>(out var chestLock);
     var isLockpick = hit.collider.TryGetComponent<Lockpick>(out var lockpick);
     if ((isLock && chestLock.HasLockpick) || isLockpick)
